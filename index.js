@@ -3,15 +3,18 @@
 const ClairClient = require('./clairClient');
 const registry = require('./registry');
 
-function run() {
+function run(imageIdentifier) {
+
+    if (!imageIdentifier) {
+        console.error('imageIdentifier argument required.');
+        return process.exit(1);
+    }
 
     var clairOptions = {
         hostname: process.env.CLAIR_HOSTNAME || 'localhost',
         port: process.env.CLAIR_PORT || 6060,
         registry: registry,
     };
-
-    var imageIdentifier = 'node:6.9';
 
     var clair = new ClairClient(clairOptions);
 
@@ -33,4 +36,4 @@ function run() {
 
 }
 
-run();
+run(process.argv[2]);
