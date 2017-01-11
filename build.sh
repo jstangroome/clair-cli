@@ -7,21 +7,9 @@ eval $(minikube docker-env)
 cd "$(dirname "${0}")"
 script_root="${PWD}"
 
-case "$(uname)" in
-  CYGWIN*)
-    cygwin=1
-    ;;
-  *)
-    cygwin=0
-    ;;
-esac
+docker build -t jstangroome/clair-cli ./
 
-external_script_root="${script_root}"
-if [ "1" == "${cygwin}" ]
-then
-  external_script_root=$(cygpath -am "${script_root}")
-fi
+kubernetes_ip=$(minikube ip)
+clair_port=30060
 
-docker build -t jstangroome/clair-cli ./ # "${external_script_root}"
-
-docker run --rm -i jstangroome/clair-cli
+docker run --rm -e CLAIR_HOSTNAME="${kubernetes_ip}" -e CLAIR_PORT="${clair_port}" -i jstangroome/clair-cli
