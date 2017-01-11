@@ -1,0 +1,15 @@
+{
+  "name": "clair-cli",
+  "version": "1.0.0",
+  "description": "0.1.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jason Stangroome",
+  "license": "ISC",
+  "dependencies": {
+    "docker-registry-client": "^3.2.6"
+  }
+}
