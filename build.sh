@@ -2,6 +2,7 @@
 set -o xtrace
 set -o errexit
 
+minikube config set WantUpdateNotification false
 eval $(minikube docker-env)
 
 cd "$(dirname "${0}")"
