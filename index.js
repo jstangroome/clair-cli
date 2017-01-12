@@ -24,14 +24,30 @@ function run(imageIdentifier) {
             return clair.postLayers(imageIdentifier, manifest);
 
         })
-        .then(function (posted) {
+        .then(function (postedLayers) {
 
-            return clair.getVulnerabilities(posted.name);
-
+            console.error(postedLayers);
+            return Promise.all(postedLayers.map(function (layer) {
+                return clair.getVulnerabilities(layer.name);
+            }));
         })
-        .then(function (layerWithVulns) {
-            console.error(layerWithVulns.Layer.NamespaceName);
-            console.error(layerWithVulns.Layer.Features);
+        .then(function (layersWithVulns) {
+            console.error('# layersWithVulns', layersWithVulns);
+            layersWithVulns.forEach(function (layerWithVulns) {
+                console.error('\n\n');
+                console.error(layerWithVulns.Layer.Name);
+                if (layerWithVulns.Layer.Features) {
+                    layerWithVulns.Layer.Features.forEach(function (feature) {
+                        if (feature.Vulnerabilities) {
+                            console.error(feature.NamespaceName);
+                            console.error(feature.Name);
+                            console.error(feature.Version);
+                            console.error(feature.Vulnerabilities.slice(0, 3));
+                            // .Name, Severity, Link
+                        }
+                    });
+                }
+            });
         });
 
 }

@@ -4,6 +4,7 @@ const querystring = require('querystring');
 const mRequest = require('./minimalRequest');
 
 function ClairClient(options) {
+    // https://github.com/coreos/clair/blob/master/Documentation/api_v1.md
 
     function addHostHttpOptions(httpOptions) {
          // TODO options.protocol
@@ -54,24 +55,41 @@ function ClairClient(options) {
 
     this.postLayers = function postLayers(imageIdentifier, manifest) {
 
-        var parentLayer;
-        var layer;
-
         return options.registry.getImagePullAuthorizationHeader(imageIdentifier)
             .then(function (authorizationHeader) {
+                //console.error('# authorizationHeader', authorizationHeader);
+                var parentLayer;
+                var promise = Promise.resolve();
+                var results = [];
 
-                layer = manifest.layers[0];
+                manifest.layers.forEach(function (layer) {
 
-                var layerAccess = {
-                    url: options.registry.getLayerUrl(imageIdentifier, layer),
-                    authorizationHeader: authorizationHeader,
-                };
-                return postLayer(layer, layerAccess, parentLayer)
+                    var layerAccess = {
+                        url: options.registry.getLayerUrl(imageIdentifier, layer),
+                        authorizationHeader: authorizationHeader,
+                    };
+
+                    promise = promise.then(function (result) {
+                        if (result) {
+                            results.push(result);
+                        }
+                        console.error('# layer', layer);
+                        console.error('# parentLayer', parentLayer);
+                        var p = postLayer(layer, layerAccess, parentLayer)
+                        parentLayer = layer;
+                        return p;
+                    });
+
+                });
+
+                return promise.then(function (result) {
+                    results.push(result);
+                    return results;
+                });
+
             })
-            .then(function (postResult) {
-                parentLayer = layer;
-                // TODO loop through remaining layers
-                return postResult;
+            .then(function (postResults) {
+                return postResults;
             });
 
     }
