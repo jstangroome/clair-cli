@@ -35,7 +35,7 @@ function _setAuthHeaderFromAuthInfo(headers, authInfo) {
 function getAuthorizationHeader(authInfo) {
     var headers = {};
     _setAuthHeaderFromAuthInfo(headers, authInfo);
-    return authInfo.authorization;
+    return headers.authorization;
 }
 
 
@@ -54,6 +54,7 @@ function getImagePullAuthInfo(rar) {
             if (err) {
                 return reject(err);
             }
+            //console.error('# login result', result);
             return resolve(result.authInfo);
         });
     });
@@ -117,11 +118,11 @@ function getImagePullAuthorizationHeader (imageIdentifier) {
 
     return getImagePullAuthInfo(rar)
         .then(function (authInfo) {
+            //console.error('# authInfo', authInfo);
             return getAuthorizationHeader(authInfo);
         });
 
 }
-
 
 
 module.exports = {
